@@ -1,11 +1,3 @@
-<!--
-  一键安装命令：
-    cp ~/env-sync/codex/AGENTS.md ~/.codex/AGENTS.md
-
-  或从远程拉取后：
-    git clone https://github.com/Samuel86-star/env-sync.git && cp env-sync/codex/AGENTS.md ~/.codex/AGENTS.md
--->
-
 # AGENTS.md — Codex 全局行为规范
 
 > 全局技能已安装于 `~/.codex/skills/`，无需在此重复定义。
@@ -15,6 +7,7 @@
 | 技能 | 作用 | 触发条件 |
 |------|------|---------|
 | **superpowers** (14 个) | TDD、调试、规划、评审、并行分发、收尾 | 开发全流程 |
+| **gstack** (46 个) | 虚拟工程团队：CEO 审视、设计评审、QA、安全、发布 | 斜杠命令 |
 | **karpathy-guidelines** | 编码行为四原则 | 每次编码 |
 | **caveman** | AI 表达压缩 75% | `/caveman lite/full/ultra` |
 

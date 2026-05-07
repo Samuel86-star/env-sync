@@ -13,11 +13,12 @@ env-sync/
 │   └── optimization.md                  # Claude Code 优化配置
 ├── cli-proxy/
 │   └── install-rtk-and-caveman.md        # RTK + Caveman 安装与配置
-├── skills/
-│   ├── install-karpathy-guidelines.md    # Karpathy Guidelines 安装
-│   └── superpowers-install-guide.md      # Superpowers 安装指南
-└── codex/
-    └── AGENTS.md                         # Codex 全局行为规范（复制到 ~/.codex/AGENTS.md）
+├── codex/
+│   └── AGENTS.md                         # Codex 全局行为规范（cp 到 ~/.codex/AGENTS.md）
+└── skills/
+    ├── install-gstack.md                 # gstack 安装指南
+    ├── install-karpathy-guidelines.md    # Karpathy Guidelines 安装
+    └── superpowers-install-guide.md      # Superpowers 安装指南
 ```
 
 ## 快速开始（新电脑）
@@ -28,7 +29,8 @@ git clone https://github.com/Samuel86-star/env-sync.git && cd env-sync
 
 ### 1. 基础工具
 ```bash
-brew install rtk
+brew install rtk       # 命令输出压缩
+brew install bun       # gstack 依赖
 ```
 
 ### 2. 全局行为规范 (Codex)
@@ -38,6 +40,7 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 > 重启 Codex 生效。
 
 ### 3. 安装技能
+- `skills/install-gstack.md`
 - `skills/install-karpathy-guidelines.md`
 - `skills/superpowers-install-guide.md`
 
@@ -48,17 +51,31 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 ### 5. Cursor 配置
 技能安装文档中均有 Cursor 章节，按需配置。
 
+## 已安装技能一览
+
+| 工具 | 技能 | 数量 |
+|------|------|:--:|
+| Claude Code | superpowers | 14 |
+| Claude Code | gstack | 45+ |
+| Claude Code | karpathy-guidelines | 1 |
+| Claude Code | caveman | 1 |
+| Codex | superpowers | 14 |
+| Codex | gstack | 46 |
+| Codex | karpathy-guidelines | 1 |
+| Codex | caveman | 1 |
+| Cursor | gstack | 45 |
+
 ## 行为规范来源
 
 | 级别 | 文件 |
 |------|------|
 | Codex 全局 | `codex/AGENTS.md` → `~/.codex/AGENTS.md` |
-| Codex 技能 | `~/.codex/skills/` (superpowers, karpathy-guidelines, caveman) |
+| Codex 技能 | `~/.codex/skills/` (superpowers, gstack, karpathy-guidelines, caveman) |
 | Claude Code 全局 | `~/.claude/settings.json` + `~/.claude/CLAUDE.md` |
 | 本项目 | README.md（仓库说明，无额外行为规则） |
 
 ## 维护
 
-- 新增文档放对应目录（`claude/`、`cli-proxy/`、`skills/`、`codex/`）
+- 新增文档放对应目录（`claude/`、`cli-proxy/`、`codex/`、`skills/`）
 - 全局配置变更需同步 `codex/AGENTS.md`
 - 提交到 `main` 后自动同步
