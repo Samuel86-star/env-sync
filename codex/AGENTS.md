@@ -1,9 +1,9 @@
 <!--
   一键安装命令：
-    cp ~/env-sync/global/AGENTS.md ~/.codex/AGENTS.md
+    cp ~/env-sync/codex/AGENTS.md ~/.codex/AGENTS.md
 
   或从远程拉取后：
-    git clone https://github.com/Samuel86-star/env-sync.git && cp env-sync/global/AGENTS.md ~/.codex/AGENTS.md
+    git clone https://github.com/Samuel86-star/env-sync.git && cp env-sync/codex/AGENTS.md ~/.codex/AGENTS.md
 -->
 
 # AGENTS.md — Codex 全局行为规范
