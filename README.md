@@ -16,7 +16,7 @@ env-sync/
 ├── skills/
 │   ├── install-karpathy-guidelines.md    # Karpathy Guidelines 安装
 │   └── superpowers-install-guide.md      # Superpowers 安装指南
-└── global/
+└── codex/
     └── AGENTS.md                         # Codex 全局行为规范（复制到 ~/.codex/AGENTS.md）
 ```
 
@@ -33,7 +33,7 @@ brew install rtk
 
 ### 2. 全局行为规范 (Codex)
 ```bash
-cp global/AGENTS.md ~/.codex/AGENTS.md
+cp codex/AGENTS.md ~/.codex/AGENTS.md
 ```
 > 重启 Codex 生效。
 
@@ -52,13 +52,13 @@ cp global/AGENTS.md ~/.codex/AGENTS.md
 
 | 级别 | 文件 |
 |------|------|
-| Codex 全局 | `global/AGENTS.md` → `~/.codex/AGENTS.md` |
+| Codex 全局 | `codex/AGENTS.md` → `~/.codex/AGENTS.md` |
 | Codex 技能 | `~/.codex/skills/` (superpowers, karpathy-guidelines, caveman) |
 | Claude Code 全局 | `~/.claude/settings.json` + `~/.claude/CLAUDE.md` |
 | 本项目 | README.md（仓库说明，无额外行为规则） |
 
 ## 维护
 
-- 新增文档放对应目录（`claude/`、`cli-proxy/`、`skills/`、`global/`）
-- 全局配置变更需同步 `global/AGENTS.md`
+- 新增文档放对应目录（`claude/`、`cli-proxy/`、`skills/`、`codex/`）
+- 全局配置变更需同步 `codex/AGENTS.md`
 - 提交到 `main` 后自动同步
