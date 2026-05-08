@@ -18,6 +18,7 @@ env-sync/
 └── skills/
     ├── install-gstack.md                 # gstack 安装指南
     ├── install-karpathy-guidelines.md    # Karpathy Guidelines 安装
+    ├── install-ruflo.md                  # Ruflo 安装指南
     └── superpowers-install-guide.md      # Superpowers 安装指南
 ```
 
@@ -31,6 +32,7 @@ git clone https://github.com/Samuel86-star/env-sync.git && cd env-sync
 ```bash
 brew install rtk       # 命令输出压缩
 brew install bun       # gstack 依赖
+npm install -g ruflo   # AI Agent 编排平台
 ```
 
 ### 2. 全局行为规范 (Codex)
@@ -43,6 +45,7 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 - `skills/install-gstack.md`
 - `skills/install-karpathy-guidelines.md`
 - `skills/superpowers-install-guide.md`
+- `skills/install-ruflo.md`
 
 ### 4. Claude Code 配置
 - `claude/optimization.md`
@@ -59,11 +62,14 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 | Claude Code | gstack | 45+ |
 | Claude Code | karpathy-guidelines | 1 |
 | Claude Code | caveman | 1 |
+| Claude Code | ruflo | 60+ |
 | Codex | superpowers | 14 |
 | Codex | gstack | 46 |
 | Codex | karpathy-guidelines | 1 |
 | Codex | caveman | 1 |
+| Codex | ruflo | 60+ |
 | Cursor | gstack | 45 |
+| Cursor | ruflo | 60+ |
 
 ## 行为规范来源
 
