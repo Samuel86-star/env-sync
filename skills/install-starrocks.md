@@ -66,12 +66,9 @@ docker pull starrocks/allin1-ubuntu:3.3-latest
 
 > `3.3-latest` 是 3.3 稳定版最新 tag。如需固定版本，替换为 `3.3.0` 等。
 
-### 步骤 2：启动容器（带数据持久化）
+### 步骤 2：启动容器
 
 ```bash
-# 创建本地数据目录
-mkdir -p ~/starrocks-data
-
 # 启动 All-in-One 容器
 docker run -d \
   --name starrocks \
@@ -79,9 +76,10 @@ docker run -d \
   -p 9030:9030 \
   -p 8030:8030 \
   -p 8040:8040 \
-  -v ~/starrocks-data:/data/deploy/starrocks \
   starrocks/allin1-ubuntu:3.3-latest
 ```
+
+> ⚠️ **不要加 `-v` 数据卷映射**。`/data/deploy/starrocks` 是容器内的安装路径，挂载本地空目录会覆盖 StarRocks 核心文件，导致启动失败。如需数据持久化，先确认容器能正常启动后再配置。
 
 **端口说明：**
 
@@ -119,22 +117,35 @@ StarRocks FE and BE are ready.
 
 ## 连接与验证
 
-### 方式 1：MySQL 客户端连接
+### 方式 1：容器内置客户端连接（推荐）
 
-StarRocks 兼容 MySQL 协议，可用任意 MySQL 客户端：
+StarRocks 兼容 MySQL 协议，但 **Homebrew 安装的 MySQL 9.x 客户端与 StarRocks 认证插件不兼容**，会报 `mysql_native_password` 缺失错误。
+
+**推荐做法：使用容器内置的 MySQL 客户端：**
 
 ```bash
-# 用系统自带的 mysql 客户端
-mysql -h 127.0.0.1 -P 9030 -u root --prompt="StarRocks> "
+# 执行单条 SQL
+docker exec -it starrocks \
+  mysql -h 127.0.0.1 -P 9030 -u root -e "SHOW DATABASES;"
 
-# 或者用 Docker 内置的 mysql
-mysql -h 127.0.0.1 -P 9030 -u root -e "SHOW DATABASES;"
+# 进入交互式会话
+docker exec -it starrocks \
+  mysql -h 127.0.0.1 -P 9030 -u root --prompt="StarRocks> "
 ```
 
 **默认账户：**
 - 用户名：`root`
 - 密码：空（无需密码）
 - 端口：`9030`
+
+### 方式 2：Docker MySQL 8.0 客户端
+
+如果需要在宿主机终端使用 `mysql` 命令，可以临时运行 MySQL 8.0 容器作为客户端：
+
+```bash
+docker run -it --rm mysql:8.0 \
+  mysql -h host.docker.internal -P 9030 -u root -e "SHOW DATABASES;"
+```
 
 ### 方式 2：HTTP 管理界面
 
@@ -210,13 +221,14 @@ docker logs --tail 50 starrocks
 docker exec -it starrocks /bin/bash
 ```
 
-### 数据备份与迁移
+### 数据备份
 
 ```bash
-# 备份数据目录（容器停止后）
-cp -r ~/starrocks-data ~/starrocks-data-backup-$(date +%Y%m%d)
+# 导出所有数据库
+docker exec starrocks mysqldump -h 127.0.0.1 -P 9030 -u root --all-databases > starrocks_backup.sql
 
-# 迁移到新机器：复制 ~/starrocks-data 目录，重新 docker run 挂载即可
+# 导入
+docker exec -i starrocks mysql -h 127.0.0.1 -P 9030 -u root < starrocks_backup.sql
 ```
 
 ### 完全卸载
@@ -229,8 +241,8 @@ docker rm starrocks
 # 删除镜像（可选）
 docker rmi starrocks/allin1-ubuntu:3.3-latest
 
-# 删除数据（⚠️ 不可逆）
-rm -rf ~/starrocks-data
+# 导出数据（可选，再删除）
+docker exec starrocks mysqldump -h 127.0.0.1 -P 9030 -u root --all-databases > starrocks_backup.sql
 ```
 
 ---
@@ -273,18 +285,28 @@ brew install mysql-client
 docker run -it --rm mysql:8.0 mysql -h host.docker.internal -P 9030 -u root
 ```
 
-### Q4: 数据目录权限错误
+### Q4: 容器启动报错 `No such file or directory`
 
+```
+/data/deploy/starrocks/fe/bin/common.sh: No such file or directory
+```
+
+**原因：** 使用了 `-v ~/starrocks-data:/data/deploy/starrocks` 挂载了本地空目录，覆盖了容器内的 StarRocks 安装文件。
+
+**解决：**
 ```bash
-# 确保本地目录有写权限
-chmod 755 ~/starrocks-data
-
-# 或重新创建
+# 1. 删除失败容器
 docker stop starrocks
 docker rm starrocks
-rm -rf ~/starrocks-data
-mkdir -p ~/starrocks-data
-docker run -d ...（重新执行启动命令）
+
+# 2. 重新启动（不带 -v 挂载）
+docker run -d \
+  --name starrocks \
+  --privileged \
+  -p 9030:9030 \
+  -p 8030:8030 \
+  -p 8040:8040 \
+  starrocks/allin1-ubuntu:3.3-latest
 ```
 
 ### Q5: BE 启动失败或崩溃
@@ -292,6 +314,25 @@ docker run -d ...（重新执行启动命令）
 **原因：** `--privileged` 未加，或 macOS 安全限制。
 
 **解决：** 确认启动命令包含 `--privileged` 参数。
+
+### Q6: MySQL 客户端报 `mysql_native_password` 缺失
+
+**错误：**
+```
+ERROR 2059 (HY000): Authentication plugin 'mysql_native_password' cannot be loaded
+```
+
+**原因：** Homebrew 安装的 MySQL 9.x 已移除 `mysql_native_password` 插件，而 StarRocks 默认使用该插件认证。
+
+**解决（二选一）：**
+
+```bash
+# 方案 A：使用容器内置客户端（推荐）
+docker exec -it starrocks mysql -h 127.0.0.1 -P 9030 -u root
+
+# 方案 B：用 Docker 运行 MySQL 8.0 客户端
+docker run -it --rm mysql:8.0 mysql -h host.docker.internal -P 9030 -u root
+```
 
 ---
 
