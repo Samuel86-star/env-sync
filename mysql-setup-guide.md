@@ -2,6 +2,7 @@
 
 > 适用场景：本地开发环境快速搭建 MySQL 8.0+
 > 预计时间：5-10 分钟
+> 更新时间：2026-05-11
 
 ---
 
@@ -24,17 +25,63 @@ mysql --version
 
 ## 2. 启动 MySQL 服务
 
+### 推荐方式：brew services（可靠、自动守护）
+
 ```bash
 # 启动并设为开机自启
 brew services start mysql
 
-# 验证状态
-brew services list | grep mysql
+# 停止
+brew services stop mysql
 
-# 手动启停（可选）
+# 重启
+brew services restart mysql
+
+# 查看状态
+brew services list | grep mysql
+```
+
+**优点：**
+- 使用 macOS `launchd` 守护进程管理，崩溃自动重启
+- PID 文件处理可靠，不会残留
+- 开机自动启动，无需手动干预
+
+### 备用方式：mysql.server（不推荐日常使用）
+
+```bash
+# 启动
 mysql.server start
+
+# 停止（⚠️ 已知问题：可能报 PID 文件错误）
 mysql.server stop
 ```
+
+**已知问题：** `mysql.server stop` 在 macOS 上经常出现以下错误：
+
+```
+ERROR! The server quit without updating PID file
+(/opt/homebrew/var/mysql/xxx.local.pid)
+```
+
+**原因：**
+- MySQL 进程实际已停止，但 PID 文件未删除
+- 或之前异常退出导致 PID 文件残留
+- 与 macOS 文件权限/ sandbox 机制冲突
+
+**解决方法：**
+
+```bash
+# 方法 1：确认进程是否还在
+lsof -i :3306
+
+# 方法 2：如果进程已停，手动删除残留 PID 文件
+sudo rm -f /opt/homebrew/var/mysql/*.pid
+
+# 方法 3：直接用 brew services 重启（推荐）
+brew services restart mysql
+```
+
+> **建议**：日常开发只用 `brew services`，不要用 `mysql.server`。
 
 ---
 
@@ -202,6 +249,52 @@ mysql -u mamba_user -p mamba < mamba_backup.sql
 
 # 查看运行状态
 mysql --login-path=local -e "SHOW STATUS LIKE 'Threads_connected';"
+```
+
+---
+
+## 9. 故障排查
+
+### Q1: `mysql.server stop` 报 PID 文件错误
+
+```bash
+# 确认 MySQL 是否还在运行
+lsof -i :3306
+mysql --login-path=local -e "SELECT 1;"
+
+# 如果已停止，删除残留 PID 文件
+sudo rm -f /opt/homebrew/var/mysql/*.pid
+
+# 改用 brew services 管理（推荐长期方案）
+brew services restart mysql
+```
+
+### Q2: 连接时报 `Can't connect through socket`
+
+```bash
+# 确认服务状态
+brew services list | grep mysql
+
+# 如果状态是 error，重启
+brew services restart mysql
+```
+
+### Q3: 忘记 root 密码
+
+```bash
+# 1. 停止服务
+brew services stop mysql
+
+# 2. 跳过权限启动
+mysqld_safe --skip-grant-tables &
+
+# 3. 无密码登录，重置密码
+mysql -u root
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
+
+# 4. 正常重启
+brew services restart mysql
 ```
 
 ---
