@@ -2,14 +2,14 @@
 
 > 仓库：https://github.com/forrestchang/andrej-karpathy-skills.git
 > 适用工具：Claude Code / OpenAI Codex / Cursor
-> 更新时间：2026-05-07
+> 更新时间：2026-05-11
 
 ---
 
 ## 目录
 
 1. [简介](#简介)
-2. [四大原则概览](#四大原则概览)
+2. [12 条原则概览](#12-条原则概览)
 3. [适用性说明](#适用性说明)
 4. [Claude Code 安装](#claude-code-安装)
 5. [OpenAI Codex 安装](#openai-codex-安装)
@@ -22,9 +22,9 @@
 
 ## 简介
 
-**Karpathy Guidelines** 是 [forrestchang](https://github.com/forrestchang) 基于 [Andrej Karpathy 的观察](https://x.com/karpathy/status/2015883857489522876)整理的行为准则，用于减少 LLM 编码中的常见错误。
+**Karpathy Guidelines** 是基于 [Andrej Karpathy 的观察](https://x.com/karpathy/status/2015883857489522876)整理的行为准则，用于减少 LLM 编码中的常见错误。本指南在原版 4 条原则基础上扩展至 **12 条**，覆盖从思考方式到工程交付的全链路。
 
-### 解决的四大痛点
+### 解决的痛点
 
 | 问题 | 表现 |
 |------|------|
@@ -32,20 +32,18 @@
 | 过度设计 | 100 行能解决的问题写出 1000 行，堆砌抽象 |
 | 误伤代码 | 改 A 时顺手改了 B 的注释/格式/逻辑 |
 | 目标模糊 | "make it work" 不是可验证的目标 |
-
-### 仓库内容
-
-| 文件 | 用途 |
-|------|------|
-| `CLAUDE.md` | Claude Code 指令文件 |
-| `skills/karpathy-guidelines/SKILL.md` | 标准技能定义（适用所有工具） |
-| `.cursor/rules/karpathy-guidelines.mdc` | Cursor 项目规则 |
-| `.claude-plugin/plugin.json` | Claude Code 插件元数据 |
-| `EXAMPLES.md` | 具体使用示例 |
+| 模型滥用 | 用模型做路由、重试等确定性工作 |
+| 预算失控 | 上下文溢出，静默消耗 token |
+| 矛盾妥协 | 混合两种冲突模式成 Frankenstein |
+| 盲目增删 | 不看调用方和共享工具就加代码 |
+| 测试无效 | 测试只验证行为，不验证业务意图 |
+| 状态迷失 | 从一个自己都说不清楚的状态继续 |
+| 风格污染 | 偷偷引入个人偏好，破坏一致性 |
+| 静默失败 | 跳过、绕过、隐藏问题后说"完成了" |
 
 ---
 
-## 四大原则概览
+## 12 条原则概览
 
 ### 1. Think Before Coding（先思考再编码）
 
@@ -90,13 +88,92 @@
 
 成功的标准让你可以独立迭代；模糊的目标（「让它能用」）需要持续澄清。
 
+### 5. Model for Judgment, Code for Determinism
+（判断用模型，确定性工作用代码）
+
+**用模型做：分类、草拟、摘要、从非结构化文本中提取。**
+**不要用模型做：路由、重试、确定性转换。**
+
+如果代码本身就能回答，代码回答。
+如果正则、解析器或类型检查就够了，不要调用模型。
+把模型调用留给真正需要判断、语感、自然语言理解的任务。
+
+### 6. Token Budget Is Law（Token 预算是铁律）
+
+**单任务：4,000 token。单会话：30,000 token。**
+
+接近预算时：
+- 总结进度，保存状态，重新开始
+- 主动暴露超预算，不要静默溢出
+
+预算意识防止上下文崩溃，强迫聚焦。
+
+### 7. Surface Conflicts, Don't Compromise（暴露冲突，不做折中）
+
+**如果两种模式矛盾，选一个（更新的 / 测试更全的）。**
+
+说明原因，把另一个标记为待清理。
+不要混用矛盾的模式拼成 Frankenstein 方案。
+
+如果冲突是架构级的且你无法独自解决，升级而不是掩盖。
+
+### 8. Read Before You Write（先读，再写）
+
+**添加代码前，先读：导出接口、直接调用方、共享工具函数。**
+
+「我觉得和这段没关系」是危险信号。
+如果不确定代码为什么这么组织，先问。
+理解现有调用图，防止孤儿函数、破坏契约、微妙回归。
+
+### 9. Tests Verify Intent, Not Just Behavior
+（测试验证意图，不只是行为）
+
+**测试必须编码「为什么这个行为重要」，而不仅仅是「它做了什么」。**
+
+业务逻辑变更时不会失败的测试是无效的。
+用意图命名测试。断言那些映射到用户价值的输出。
+行为改变时测试应该失败——而且失败应该告诉你哪个用户承诺被打破了。
+
+### 10. Checkpoint at Every Meaningful Step
+（每完成一个重要步骤就打检查点）
+
+**总结：做了什么、验证了什么、还剩什么。**
+
+不要从一个你无法描述清楚的状态继续下一步。
+搞丢上下文了就停下来，重新说明。
+
+好的检查点：
+```
+Done: [已完成的工作]
+Verified: [测试/证据]
+Remaining: [下一步]
+```
+
+### 11. Follow Convention, Even If You Disagree
+（遵循代码库惯例，即使你不同意）
+
+**在代码库内部，遵循 > 个人偏好。**
+
+如果你真的认为某个惯例有害，明确指出来，不要偷偷引入新方案。
+一致性是一个功能。分歧的成本比你的意见更持久。
+
+### 12. Fail Loudly（失败要出声）
+
+**「完成了」是错的——如果有东西被静默跳过了。**
+**「测试通过」是错的——如果有测试被跳过了。**
+
+默认暴露不确定性，不要藏着掖着。
+静默失败会累积。大声失败会被修复。
+
+遇到模糊性、边界情况或不完整的验证时，说出来——不要平滑过去。
+
 ---
 
 ## 适用性说明
 
 **适用于 Codex 吗？是的。**
 
-四原则是纯行为准则，不依赖任何特定工具：
+12 条原则是纯行为准则，不依赖任何特定工具：
 - 没有脚本依赖
 - 没有 MCP server 要求
 - 没有钩子函数
@@ -108,6 +185,14 @@
 | Simplicity First | ✅ | ✅ | ✅ |
 | Surgical Changes | ✅ | ✅ | ✅ |
 | Goal-Driven Execution | ✅ | ✅ | ✅ |
+| Model for Judgment, Code for Determinism | ✅ | ✅ | ✅ |
+| Token Budget Is Law | ✅ | ✅ | ✅ |
+| Surface Conflicts, Don't Compromise | ✅ | ✅ | ✅ |
+| Read Before You Write | ✅ | ✅ | ✅ |
+| Tests Verify Intent, Not Just Behavior | ✅ | ✅ | ✅ |
+| Checkpoint at Every Meaningful Step | ✅ | ✅ | ✅ |
+| Follow Convention, Even If You Disagree | ✅ | ✅ | ✅ |
+| Fail Loudly | ✅ | ✅ | ✅ |
 
 ---
 
@@ -152,6 +237,20 @@ rm -rf /tmp/ak-skills
 cp /path/to/CLAUDE.md ~/your-project/CLAUDE.md
 ```
 
+### 方法 D：自定义扩展版（本仓库方式）
+
+如需使用扩展版 12 条原则：
+
+```bash
+# 从本仓库复制扩展版 SKILL.md
+cp skills/karpathy-guidelines/SKILL.md ~/.agents/skills/karpathy-guidelines/SKILL.md
+
+# Claude Code 是软链接，自动生效
+# Codex 需要复制
+rm -rf ~/.codex/skills/karpathy-guidelines
+cp -r ~/.agents/skills/karpathy-guidelines ~/.codex/skills/karpathy-guidelines
+```
+
 ---
 
 ## OpenAI Codex 安装
@@ -191,7 +290,16 @@ rm -rf /tmp/ak-skills
 @~/.codex/skills/karpathy-guidelines/SKILL.md
 ```
 
-或直接将四原则内容合并到项目的 `AGENTS.md` 中。
+或直接将 12 条原则内容合并到项目的 `AGENTS.md` 中。
+
+### 方法 D：自定义扩展版（本仓库方式）
+
+如需使用扩展版 12 条原则：
+
+```bash
+# 从本仓库复制扩展版 SKILL.md
+cp skills/karpathy-guidelines/SKILL.md ~/.codex/skills/karpathy-guidelines/SKILL.md
+```
 
 ---
 
@@ -215,8 +323,8 @@ rm -rf /tmp/ak-skills
 ### 方法 B：全局 .cursorrules
 
 ```bash
-# 将四原则核心内容追加到全局 rules 文件
-cat /tmp/ak-skills/skills/karpathy-guidelines/SKILL.md >> ~/.cursorrules
+# 将 12 条原则核心内容追加到全局 rules 文件
+cat skills/karpathy-guidelines/SKILL.md >> ~/.cursorrules
 ```
 
 ### 方法 C：个人技能目录
@@ -285,18 +393,19 @@ cat ~/your-project/.cursor/rules/karpathy-guidelines.mdc | head -5
 
 ### 可能需要调整的地方
 
-四原则偏保守（「谨慎优于速度」），在某些场景下可以灵活处理：
+12 条原则偏保守（「谨慎优于速度」），在某些场景下可以灵活处理：
 
 - **简单任务**：比如改一个字符串、加一行日志，不必逐条走全部原则
 - **新建项目**：新建时没有「现有风格」需要匹配，Surgical Changes 原则自然放宽
 - **快速原型**：如果用户明确说「快速出一个原型」，可以降低简洁标准的严格执行
+- **Token 预算**：本地开发如果上下文足够，4K/30K 的硬限制可以放宽，但**暴露超预算的意识不能丢**
 
 ---
 
 ## 与其他技能的配合
 
 ```bash
-# 你的周末新电脑上建议同时安装以下技能：
+# 建议同时安装以下技能：
 
 # 1. RTK - 命令输出压缩
 brew install rtk
@@ -305,29 +414,38 @@ brew install rtk
 mkdir -p ~/.agents/skills/caveman
 # 复制 SKILL.md 到该目录
 
-# 3. Karpathy Guidelines - 编码质量基线
+# 3. Karpathy Guidelines - 编码质量基线（12 条原则）
 # 按本文档安装
 
-# 4. Superpowers - 完整工作流（可选，已安装核心版）
+# 4. Superpowers - 完整工作流
 claude plugins install superpowers@superpowers-dev
+
+# 5. gstack - 虚拟工程团队（CEO/设计/QA/安全/发布）
+# 见 install-gstack.md
+
+# 6. ui-ux-pro-max - UI/UX 设计智能
+# 见 install-ui-ux-pro-max.md
 ```
 
-**推荐顺序**：先装 RTK + Caveman（省 token），再装 Karpathy Guidelines + Superpowers（提质量）。
+**推荐顺序**：先装 RTK + Caveman（省 token），再装 Karpathy Guidelines + Superpowers（提质量），最后用 gstack + ui-ux-pro-max（扩能力）。
 
 ---
 
 ## 附录：配置文件路径速查
 
 ```
-# Karpathy Guidelines
+# Karpathy Guidelines（扩展版 12 条）
 ~/.codex/skills/karpathy-guidelines/   # Codex 全局技能
 ~/.claude/skills/karpathy-guidelines   # → 软链接到共享目录（Claude Code）
 ~/.agents/skills/karpathy-guidelines/  # 共享技能源文件
-.cursor/rules/karpathy-guidelines.mdc  # Cursor 项目规则
+cursor/rules/karpathy-guidelines.mdc   # Cursor 项目规则
+
+# 本仓库扩展版
+skills/karpathy-guidelines/SKILL.md     # 12 条原则完整定义
 
 # 源仓库结构
 CLAUDE.md                               # Claude Code 指令文件
-skills/karpathy-guidelines/SKILL.md     # 标准技能定义
+skills/karpathy-guidelines/SKILL.md     # 原版 4 条原则
 .cursor/rules/karpathy-guidelines.mdc   # Cursor 规则
 EXAMPLES.md                             # 使用示例
 ```

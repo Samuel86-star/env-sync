@@ -18,6 +18,7 @@ env-sync/
 └── skills/
     ├── install-gstack.md                 # gstack 安装指南
     ├── install-karpathy-guidelines.md    # Karpathy Guidelines 安装
+    ├── install-ui-ux-pro-max.md            # UI-UX Pro Max 安装
     ├── install-ruflo.md                  # Ruflo 安装指南
     └── superpowers-install-guide.md      # Superpowers 安装指南
 ```
@@ -44,6 +45,7 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 ### 3. 安装技能
 - `skills/install-gstack.md`
 - `skills/install-karpathy-guidelines.md`
+- `skills/install-ui-ux-pro-max.md`
 - `skills/superpowers-install-guide.md`
 - `skills/install-ruflo.md`
 
@@ -63,11 +65,13 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 | Claude Code | karpathy-guidelines | 1 |
 | Claude Code | caveman | 1 |
 | Claude Code | ruflo | 60+ |
+| Claude Code | ui-ux-pro-max | 1 |
 | Codex | superpowers | 14 |
 | Codex | gstack | 46 |
 | Codex | karpathy-guidelines | 1 |
 | Codex | caveman | 1 |
 | Codex | ruflo | 60+ |
+| Codex | ui-ux-pro-max | 1 |
 | Cursor | gstack | 45 |
 | Cursor | ruflo | 60+ |
 
@@ -76,7 +80,7 @@ cp codex/AGENTS.md ~/.codex/AGENTS.md
 | 级别 | 文件 |
 |------|------|
 | Codex 全局 | `codex/AGENTS.md` → `~/.codex/AGENTS.md` |
-| Codex 技能 | `~/.codex/skills/` (superpowers, gstack, karpathy-guidelines, caveman) |
+| Codex 技能 | `~/.codex/skills/`: superpowers, gstack, karpathy-guidelines, caveman, ui-ux-pro-max |
 | Claude Code 全局 | `~/.claude/settings.json` + `~/.claude/CLAUDE.md` |
 | 本项目 | README.md（仓库说明，无额外行为规则） |
 
