@@ -1,8 +1,9 @@
-# Docker Desktop 安装与配置指南（macOS）
+# Docker Desktop 安装与配置指南（macOS + Homebrew）
 
 > 适用场景：本地容器化开发、运行数据库（StarRocks / MySQL Docker 版）、构建/测试容器镜像
 > 适用芯片：Apple Silicon (M1/M2/M3) 及 Intel Mac
-> 预计时间：10 分钟
+> 安装方式：Homebrew Cask（一键命令，后续可 `brew upgrade`）
+> 预计时间：5 分钟
 > 更新时间：2026-05-11
 
 ---
@@ -37,33 +38,31 @@ uname -m
 
 ---
 
-## 2. 下载与安装
+## 2. 安装
 
-### 2.1 下载 Docker Desktop
+### 2.1 通过 Homebrew Cask 安装
 
-访问官方下载页面：
-
-```
-https://www.docker.com/products/docker-desktop
+```bash
+brew install --cask docker
 ```
 
-**选择正确的版本：**
+> ⚠️ **必须加 `--cask`**：`brew install docker`（不加 `--cask`）只装 Docker CLI，没有 Docker Engine，无法运行容器。加 `--cask` 才会安装完整的 Docker Desktop。
 
-| 芯片 | 下载选择 |
-|------|----------|
-| Apple Silicon (M1/M2/M3) | **Mac with Apple Chip** |
-| Intel Mac | **Mac with Intel Chip** |
+### 2.2 首次启动
 
-> 下错版本会导致启动报错或性能严重下降。不确定芯片类型？
-> 点击屏幕左上角 🍎 → 关于本机 → 查看"芯片"或"处理器"。
+Homebrew 安装的是 GUI 应用，首次需要手动启动：
 
-### 2.2 安装步骤
+```bash
+# 方式 1：命令行启动
+open /Applications/Docker.app
 
-1. 双击下载的 `.dmg` 文件
-2. 将 **Docker** 图标拖拽到 **Applications** 文件夹
-3. 从 **启动台** 或 **访达 → 应用程序** 打开 Docker Desktop
-4. 首次启动会要求输入 Mac 登录密码（授权安装辅助工具）
-5. 接受服务条款，完成初始化
+# 方式 2：从启动台 / 访达 → 应用程序 打开 Docker Desktop
+```
+
+首次启动会要求：
+1. 输入 Mac 登录密码（授权安装辅助工具）
+2. 接受服务条款
+3. 完成初始化（约 30 秒）
 
 ### 2.3 Apple Silicon 额外配置（关键）
 
@@ -75,6 +74,12 @@ Docker Desktop → Settings（齿轮图标）→ General
 ```
 
 > 不开启此选项，运行 `starrocks/allin1-ubuntu` 等 x86 镜像时会报 `exec format error`。
+
+### 2.4 后续更新
+
+```bash
+brew upgrade --cask docker
+```
 
 ---
 
@@ -289,6 +294,7 @@ docker run -d \
 rm -rf ~/Library/Containers/com.docker.docker/Data/tasks
 
 # 3. 重启 Docker Desktop
+open /Applications/Docker.app
 ```
 
 ### Q2: 拉取镜像时报 `no matching manifest for linux/arm64`
