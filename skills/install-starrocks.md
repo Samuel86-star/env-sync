@@ -117,11 +117,9 @@ StarRocks FE and BE are ready.
 
 ## 连接与验证
 
-### 方式 1：容器内置客户端连接（推荐）
+### 连接方式
 
-StarRocks 兼容 MySQL 协议，但 **Homebrew 安装的 MySQL 9.x 客户端与 StarRocks 认证插件不兼容**，会报 `mysql_native_password` 缺失错误。
-
-**推荐做法：使用容器内置的 MySQL 客户端：**
+**使用容器内置的 MySQL 客户端：**
 
 ```bash
 # 执行单条 SQL
@@ -138,14 +136,7 @@ docker exec -it starrocks \
 - 密码：空（无需密码）
 - 端口：`9030`
 
-### 方式 2：Docker MySQL 8.0 客户端
-
-如果需要在宿主机终端使用 `mysql` 命令，可以临时运行 MySQL 8.0 容器作为客户端：
-
-```bash
-docker run -it --rm mysql:8.0 \
-  mysql -h host.docker.internal -P 9030 -u root -e "SHOW DATABASES;"
-```
+> ⚠️ **不要用 Homebrew 的 MySQL 9.x 客户端连接**。StarRocks 使用 `mysql_native_password` 认证，MySQL 9.x 已移除该插件，会报 `ERROR 2059`。容器内置的 MySQL 客户端无此问题。
 
 ### 方式 2：HTTP 管理界面
 
